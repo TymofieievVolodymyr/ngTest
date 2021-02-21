@@ -1,19 +1,27 @@
-import {Component} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+
+import { UserService } from './user.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  oddNumbers: number[] = [];
-  evenNumbers: number[] = [];
+export class AppComponent implements OnInit, OnDestroy {
+  userActivated = false;
+  private activatedSub: Subscription;
 
-  onIntervalFired(firedNumber: number): void {
-    if (firedNumber % 2 === 0) {
-      this.evenNumbers.push(firedNumber);
-    } else {
-      this.oddNumbers.push(firedNumber);
-    }
+  constructor(private userService: UserService) {
+  }
+
+  ngOnInit(): void {
+    this.activatedSub = this.userService.activatedEmitter.subscribe(didActivate => {
+      this.userActivated = didActivate;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.activatedSub.unsubscribe();
   }
 }
